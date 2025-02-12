@@ -2,7 +2,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
@@ -23,6 +22,64 @@ enum Role {
   STUDENT
 }
 
+// Student model with essential information
+model Student {
+  id           Int       @id @default(autoincrement())  // Using Int as ID
+  rollNumber   String    @unique                       // School-assigned student ID
+  firstName    String
+  lastName     String
+  dateOfBirth  DateTime
+  grade        Int       // Current grade/class level
+  section      String    // Class section (A, B, C, etc.)
+  contactPhone String?
 
+  // Academic records
+  enrollments  Enrollment[]
+  attendances  Attendance[]
 
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
 
+// Course information
+model Course {
+  id          String    @id @default(uuid())
+  name        String
+  grade       Int       // Which grade/class this course is for
+  section     String    // Which section this course is for
+
+  enrollments Enrollment[]
+  attendances Attendance[]
+}
+
+// Track student course enrollment
+model Enrollment {
+  id        String   @id @default(uuid())
+  studentId Int      // Changed from String to Int to match Student.id
+  courseId  String
+  status    Status   @default(ACTIVE)
+
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+}
+
+// Track student attendance
+model Attendance {
+  id        String   @id @default(uuid())
+  studentId Int      // Changed from String to Int to match Student.id
+  courseId  String
+  date      DateTime
+  present   Boolean
+
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId, date])
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}

@@ -19,7 +19,7 @@ app.use(express.json()); // Parse JSON requests
 
 // Routes
 app.use("/api/auth", authRoutes);
-// app.use("/api/students", studentRoutes);
+app.use("/api/students", studentRoutes);
 // app.use("/api/courses", courseRoutes);
 // app.use("/api/attendance", attendanceRoutes);
 // app.use("/api/notifications", notificationRoutes);
