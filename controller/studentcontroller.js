@@ -39,10 +39,6 @@ exports.registerStudent = async (req, res) => {
       message: "Student registered successfully",
       student: newStudent,
     });
-//   } catch (error) {
-//     console.error("Error registering student:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
 } catch (error) {
     console.error("Error registering student:", error.message, error.stack);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -55,15 +51,22 @@ exports.getStudentDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const student = await prisma.student.findUnique({
-      where: { id: parseInt(id) },
-    });
+    if (id) {
+      // Fetch specific student by ID
+      const student = await prisma.student.findUnique({
+        where: { id: parseInt(id) },
+      });
 
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+
+      res.status(200).json(student);
+    } else {
+      // Fetch all students
+      const students = await prisma.student.findMany();
+      res.status(200).json(students);
     }
-
-    res.status(200).json(student);
   } catch (error) {
     console.error("Error fetching student details:", error);
     res.status(500).json({ message: "Server error" });

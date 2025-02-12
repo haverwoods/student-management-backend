@@ -20,6 +20,7 @@ body("contactPhone")
 
 // Routes without authentication middleware
 router.get("/:id", studentController.getStudentDetails);
+router.get("/", studentController.getStudentDetails);
 router.post("/", studentValidation, studentController.registerStudent);
 router.put("/:id", studentController.updateStudentDetails);
 router.delete("/:id", studentController.deleteStudent);
