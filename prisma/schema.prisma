@@ -41,16 +41,27 @@ model Student {
   updatedAt    DateTime  @updatedAt
 }
 
+model Teacher {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String
+  courses   Course[] @relation("CourseTeacher")
+}
+
 // Course information
 model Course {
   id          String    @id @default(uuid())
   name        String
-  grade       Int       // Which grade/class this course is for
-  section     String    // Which section this course is for
-
+  grade       Int
+  section     String
+  teacherId   Int?      // Make teacherId nullable
+  teacher     Teacher?  @relation("CourseTeacher", fields: [teacherId], references: [id]) // Make teacher nullable
   enrollments Enrollment[]
   attendances Attendance[]
 }
+
 
 // Track student course enrollment
 model Enrollment {

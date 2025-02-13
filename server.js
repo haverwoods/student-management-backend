@@ -4,7 +4,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/authroute.js");
 const studentRoutes = require("./routes/studentroute.js");
 const courseRoutes = require("./routes/courseroute.js");
-const attendanceRoutes = require("./routes/attendanceRoute.js");
+const teacherRoutes = require("./routes/teacherRoute.js");
 const notificationRoutes = require("./routes/notificationroute.js");
 
 // Load environment variables
@@ -20,8 +20,8 @@ app.use(express.json()); // Parse JSON requests
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
-// app.use("/api/courses", courseRoutes);
-// app.use("/api/attendance", attendanceRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/teacher", teacherRoutes);
 // app.use("/api/notifications", notificationRoutes);
 
 

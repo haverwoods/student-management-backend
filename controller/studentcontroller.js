@@ -11,7 +11,7 @@ exports.registerStudent = async (req, res) => {
   }
 
   try {
-    const { rollNumber, firstName, lastName, dateOfBirth, grade, section, contactPhone } = req.body;
+    const { rollNumber, firstName, lastName, dateOfBirth, grade, section, contactPhone , createdAt } = req.body;
 
     // Check if the student already exists
     const existingStudent = await prisma.student.findUnique({
@@ -32,6 +32,7 @@ exports.registerStudent = async (req, res) => {
         grade: parseInt(grade, 10),
         section,
         contactPhone,
+        createdAt: createdAt ? new Date(createdAt) : undefined,
       },
     });
 
@@ -96,7 +97,7 @@ exports.updateStudentDetails = async (req, res) => {
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined, // Update only if provided
         grade,
         section,
-        contactPhone,
+        contactPhone
       },
     });
 
