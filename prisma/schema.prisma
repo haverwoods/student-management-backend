@@ -32,6 +32,7 @@ model Student {
   grade        Int       // Current grade/class level
   section      String    // Class section (A, B, C, etc.)
   contactPhone String?
+  profileImage String?  //store the URL of the student's profile image
 
   // Academic records
   enrollments  Enrollment[]
