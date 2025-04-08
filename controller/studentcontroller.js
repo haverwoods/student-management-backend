@@ -251,33 +251,7 @@ exports.updateStudentDetails = [
       };
 
       // Handle file upload if present
-      if (req.file) {
-        try {
-          const fileName = `profile-images/${Date.now()}_${
-            req.file.originalname
-          }`;
-          const { data, error } = await supabase.storage
-            .from("student-images")
-            .upload(fileName, req.file.buffer, {
-              contentType: req.file.mimetype,
-            });
-
-          if (error) throw error;
-
-          const {
-            data: { publicUrl },
-          } = supabase.storage.from("student-images").getPublicUrl(fileName);
-
-          updateData.profileImage = publicUrl;
-        } catch (uploadError) {
-          return res.status(500).json({
-            message: "File upload failed",
-            error: uploadError.message,
-          });
-        }
-      }
-
-      const updatedStudent = await prisma.student.update({
+            const updatedStudent = await prisma.student.update({
         where: { id: studentId },
         data: updateData,
       });

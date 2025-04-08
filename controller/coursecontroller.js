@@ -11,22 +11,18 @@ exports.createCourse = async (req, res) => {
   }
 
   try {
-    const { name, grade, section , teacherId} = req.body;
+    const { name, grade, section, teacherId, startDay, endDay, startTime, endTime } = req.body;
 
     // Check if the course already exists for the same grade and section
     const existingCourse = await prisma.course.findFirst({
       where: {
-        AND: [
-          { name },
-          { grade },
-          { section }
-        ]
-      }
+        AND: [{ name }, { grade }, { section }],
+      },
     });
 
     if (existingCourse) {
-      return res.status(400).json({ 
-        message: "Course already exists for this grade and section" 
+      return res.status(400).json({
+        message: "Course already exists for this grade and section",
       });
     }
 
@@ -37,6 +33,10 @@ exports.createCourse = async (req, res) => {
         grade: parseInt(grade, 10),
         section,
         teacherId,
+        startDay,
+        endDay,
+        startTime,
+        endTime,
       },
     });
 
@@ -61,8 +61,8 @@ exports.getCourseDetails = async (req, res) => {
         where: { id },
         include: {
           enrollments: true,
-          attendances: true
-        }
+          attendances: true,
+        },
       });
 
       if (!course) {
@@ -75,8 +75,8 @@ exports.getCourseDetails = async (req, res) => {
       const courses = await prisma.course.findMany({
         include: {
           enrollments: true,
-          attendances: true
-        }
+          attendances: true,
+        },
       });
       res.status(200).json(courses);
     }
@@ -93,7 +93,7 @@ exports.updateCourse = async (req, res) => {
     const { name, grade, section } = req.body;
 
     const existingCourse = await prisma.course.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!existingCourse) {
@@ -105,7 +105,7 @@ exports.updateCourse = async (req, res) => {
       data: {
         name,
         grade: grade ? parseInt(grade, 10) : undefined,
-        section
+        section,
       },
     });
 
@@ -125,7 +125,7 @@ exports.deleteCourse = async (req, res) => {
     const { id } = req.params;
 
     const existingCourse = await prisma.course.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!existingCourse) {
@@ -133,7 +133,7 @@ exports.deleteCourse = async (req, res) => {
     }
 
     await prisma.course.delete({
-      where: { id }
+      where: { id },
     });
 
     res.status(200).json({ message: "Course deleted successfully" });
