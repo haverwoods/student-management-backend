@@ -9,14 +9,14 @@ const teacherValidation = [
   body("lastName").not().isEmpty().withMessage("Last name is required"),
   body("email").isEmail().withMessage("Valid email is required"),
   body("phone")
-    .matches(/^\+?[\d\s-]+$/)  // Modified to accept more phone number formats
+  .matches(/^(\+\d{1,3}[\s-]?)?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}$|^\d{10,12}$/) // Modified to accept more phone number formats
     .withMessage("Contact phone must contain only numbers, spaces, hyphens, and optionally start with +")
 ];
 
 // Routes for Teacher
 router.get("/:id", teacherController.getTeacherDetails);
 router.get("/", teacherController.getTeacherDetails);
-router.post("/", teacherValidation, teacherController.registerTeacher);
+router.post("/",  teacherValidation,teacherController.registerTeacher);
 router.put("/:id", teacherController.updateTeacherDetails);
 router.delete("/:id", teacherController.deleteTeacher);
 

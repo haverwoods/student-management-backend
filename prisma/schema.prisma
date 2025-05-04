@@ -61,6 +61,12 @@ model Course {
   teacher     Teacher?  @relation("CourseTeacher", fields: [teacherId], references: [id]) // Make teacher nullable
   enrollments Enrollment[]
   attendances Attendance[]
+   // New fields
+  startDay    String?
+  endDay      String?
+  startTime   String?
+  endTime     String?
+
 }
 
 

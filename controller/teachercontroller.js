@@ -46,43 +46,52 @@ const prisma = new PrismaClient();
 // };
 // Register a new teacher
 exports.registerTeacher = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { firstName, lastName, email, phone } = req.body;
+    console.log("RAW Body Received:", req.body);
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
     }
-  
-    try {
-      const { firstName, lastName, email, phone } = req.body;
-  
-      // Check if the teacher already exists
-      const existingTeacher = await prisma.teacher.findUnique({
-        where: { email }
-      });
-  
-      if (existingTeacher) {
-        return res.status(400).json({ message: "Teacher with this email already exists" });
-      }
-  
-      // Create new teacher record
-      const newTeacher = await prisma.teacher.create({
-        data: {
-          firstName,
-          lastName,
-          email,
-          phone
-        },
-      });
-  
-      res.status(201).json({
-        message: "Teacher registered successfully",
-        teacher: newTeacher
-      });
-    } catch (error) {
-      console.error("Error registering teacher:", error.message, error.stack);
-      res.status(500).json({ message: "Server error", error: error.message });
+    
+    // Check if the teacher already exists
+    const existingTeacher = await prisma.teacher.findUnique({
+      where: {
+        email: email,  // Ensure it's correctly passed
+      },
+    });
+
+    if (existingTeacher) {
+      return res
+        .status(400)
+        .json({ message: "Teacher with this email already exists" });
     }
-  };
-  
+
+    // Create new teacher record
+    const newTeacher = await prisma.teacher.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        phone,
+      },
+    });
+
+    res.status(201).json({
+      message: "Teacher registered successfully",
+      teacher: newTeacher,
+    });
+  } catch (error) {
+    console.error("Error registering teacher:", error.message, error.stack);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 // Get teacher details
 exports.getTeacherDetails = async (req, res) => {
   try {
@@ -139,7 +148,9 @@ exports.updateTeacherDetails = async (req, res) => {
         email,
         phone,
         courses: {
-          connect: courseIds ? courseIds.map(courseId => ({ id: courseId })) : [], // Update courses
+          connect: courseIds
+            ? courseIds.map((courseId) => ({ id: courseId }))
+            : [], // Update courses
         },
       },
     });

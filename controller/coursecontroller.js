@@ -13,16 +13,38 @@ exports.createCourse = async (req, res) => {
   try {
     const { name, grade, section, teacherId, startDay, endDay, startTime, endTime } = req.body;
 
+    // If teacherId is a name (e.g., "kim"), find the teacher ID first
+    let finalTeacherId = teacherId;
+    if (isNaN(teacherId)) { // If it's a name, not a number
+      const teacher = await prisma.teacher.findFirst({
+        where: { firstName: teacherId }, // Or use firstName, lastName, etc.
+      });
+      if (!teacher) {
+        return res.status(400).json({ message: "Teacher not found by name" });
+      }
+      finalTeacherId = teacher.id; // Use the teacher's ID from the database
+    }
+
+        // Validate that all required fields are present
+        if (!name || !section || !startDay || !endDay || !startTime || !endTime) {
+          return res.status(400).json({ message: "All fields are required: name, grade, section, startDay, endDay, startTime, endTime" });
+        }
+
     // Check if the course already exists for the same grade and section
+
     const existingCourse = await prisma.course.findFirst({
       where: {
-        AND: [{ name }, { grade }, { section }],
+        AND: [
+          { name },
+          { grade: parseInt(grade, 10) }, // Ensure grade is properly casted to an integer
+          { section },
+        ],
       },
     });
-
+    
     if (existingCourse) {
       return res.status(400).json({
-        message: "Course already exists for this grade and section",
+        message: "Course already exists with the same name, grade, and section",
       });
     }
 
@@ -32,7 +54,7 @@ exports.createCourse = async (req, res) => {
         name,
         grade: parseInt(grade, 10),
         section,
-        teacherId,
+        teacherId: finalTeacherId,
         startDay,
         endDay,
         startTime,
@@ -72,7 +94,7 @@ exports.getCourseDetails = async (req, res) => {
       res.status(200).json(course);
     } else {
       // Fetch all courses
-      const courses = await prisma.course.findMany({
+      const courses = await prisma.course.findMany({ 
         include: {
           enrollments: true,
           attendances: true,
